@@ -4,7 +4,9 @@ import React from "react";
 const Page = () => {
   return (
     <div>
-      <Button></Button>
+      <h1 className="text-3xl font-bold">Welcome to Converso</h1>
+      <p className="mt-4 text-lg">Your real-time AI teaching platform.</p>
+      <Button className="mt-6">Get Started</Button>
     </div>
   );
 };
