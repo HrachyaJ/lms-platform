@@ -1,5 +1,5 @@
-const page = () => {
-  return <div>Companions</div>;
+const CompanionsLibrary = () => {
+  return <div>Companions Library</div>;
 };
 
-export default page;
+export default CompanionsLibrary;
