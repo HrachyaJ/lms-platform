@@ -85,15 +85,31 @@ export const getRecentSessions = async (limit = 10) => {
 
   const { data, error } = await supabase
     .from("session_history")
-    .select(`companions:companion_id (*)`)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .select(`companion_id, companions:companion_id (*)`)
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data.map(({ companions }) => companions);
+  // Get unique companions in order, keeping only the first (most recent) occurrence
+  const seenIds = new Set<string>();
+  const uniqueCompanions: Companion[] = [];
+
+  for (const item of data) {
+    const companion = item.companions as Companion;
+
+    if (companion && !seenIds.has(companion.id)) {
+      seenIds.add(companion.id);
+      uniqueCompanions.push(companion);
+
+      if (uniqueCompanions.length === limit) {
+        break;
+      }
+    }
+  }
+
+  return uniqueCompanions;
 };
 
 export const getUserSessions = async (userId: string, limit = 10) => {
@@ -101,16 +117,32 @@ export const getUserSessions = async (userId: string, limit = 10) => {
 
   const { data, error } = await supabase
     .from("session_history")
-    .select(`companions:companion_id (*)`)
+    .select(`companion_id, companions:companion_id (*)`)
     .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data.map(({ companions }) => companions);
+  // Get unique companions in order, keeping only the first (most recent) occurrence
+  const seenIds = new Set<string>();
+  const uniqueCompanions: Companion[] = [];
+
+  for (const item of data) {
+    const companion = item.companions as Companion;
+
+    if (companion && !seenIds.has(companion.id)) {
+      seenIds.add(companion.id);
+      uniqueCompanions.push(companion);
+
+      if (uniqueCompanions.length === limit) {
+        break;
+      }
+    }
+  }
+
+  return uniqueCompanions;
 };
 
 export const getUserCompanions = async (userId: string, limit = 10) => {
@@ -126,4 +158,38 @@ export const getUserCompanions = async (userId: string, limit = 10) => {
   }
 
   return data;
+};
+
+export const newCompanionPermissions = async () => {
+  const { userId, has } = await auth();
+  const supabase = createSupabaseClient();
+
+  let limit = 0;
+
+  if (has({ plan: "pro_companion" })) {
+    return true;
+  } else if (has({ feature: "3_companion_limit" })) {
+    limit = 3;
+  } else if (has({ feature: "10_companion_limit" })) {
+    limit = 10;
+  }
+
+  const { data, error } = await supabase
+    .from("companions")
+    .select("id", { count: "exact" })
+    .eq("author", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const companionCount = data?.length;
+
+  console.log(companionCount);
+
+  if (companionCount >= limit) {
+    return false;
+  } else {
+    return true;
+  }
 };
