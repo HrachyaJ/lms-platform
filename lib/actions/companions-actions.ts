@@ -145,7 +145,7 @@ export const getUserSessions = async (userId: string, limit = 10) => {
   return uniqueCompanions;
 };
 
-export const getUserCompanions = async (userId: string, limit = 10) => {
+export const getUserCompanions = async (userId: string) => {
   const supabase = createSupabaseClient();
 
   const { data, error } = await supabase

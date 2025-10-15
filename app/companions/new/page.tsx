@@ -34,11 +34,11 @@ const NewCompanion = async () => {
 
           <div className="space-y-4 max-w-sm">
             <h1 className="text-4xl font-bold text-gray-900">
-              You've Reached Your Limit
+              You&apos;ve Reached Your Limit
             </h1>
 
             <p className="text-lg text-gray-600 leading-relaxed">
-              You’ve reached your companion limit. Upgrade to create more
+              You&apos;ve reached your companion limit. Upgrade to create more
               companions and premium features.
             </p>
           </div>
